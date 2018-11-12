@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	tools:context=".PenSettingsFragment">
+	<data>
+		<variable
+			name="model"
+			type="jp.co.apcom.test.Model"/>
+	</data>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		<TextView
+			style="?android:preferenceCategoryStyle"
+			android:text="color"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"/>
+		<RadioGroup
+			android:checkedButton="@={model.idByColor}"
+			android:onCheckedChanged="@{model.onSplitTypeChanged}"
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			<RadioButton
+				android:id="@+id/black"
+				android:text="black"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"/>
+			<RadioButton
+				android:id="@+id/red"
+				android:text="red"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"/>
+			<!--
+			<RadioButton
+				android:id="@+id/black"
+				android:text="black"
+				android:checked="@{model.sketchColor == android.graphics.Color.BLACK}"
+				android:onCheckedChanged="@{(view, checked) -> model.onCheckedChanged(checked, android.graphics.Color.BLACK)}"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"/>
+			<RadioButton
+				android:id="@+id/red"
+				android:text="red"
+				android:checked="@{model.sketchColor == android.graphics.Color.RED}"
+				android:onCheckedChanged="@{(view, checked) -> model.onCheckedChanged(checked, android.graphics.Color.RED)}"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"/>
+				-->
+		</RadioGroup>
+		<TextView
+			style="?android:preferenceCategoryStyle"
+			android:text="stroke width"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"/>
+	</LinearLayout>
+</layout>

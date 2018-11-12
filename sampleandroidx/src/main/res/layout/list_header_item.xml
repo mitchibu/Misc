@@ -1,0 +1,14 @@
+<layout
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<data>
+		<!--<variable-->
+			<!--name="item"-->
+			<!--type="jp.co.apcom.databindingrecyclerview.ItemHeader"/>-->
+	</data>
+	<TextView
+		style="?android:preferenceCategoryStyle"
+		android:background="#ff0"
+		android:layout_gravity="center_vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"/>
+</layout>

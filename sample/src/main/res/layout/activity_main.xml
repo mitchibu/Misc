@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+	<data>
+		<variable
+			name="splashClick"
+			type="android.view.View.OnClickListener"/>
+		<variable
+			name="sampleClick"
+			type="android.view.View.OnClickListener"/>
+		<variable
+			name="dialogClick"
+			type="android.view.View.OnClickListener"/>
+		<variable
+			name="fragmentClick"
+			type="android.view.View.OnClickListener"/>
+	</data>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		<Button
+			android:onClick="@{view -> splashClick.onClick(view)}"
+			android:text="splash"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+		<Button
+			android:onClick="@{view -> sampleClick.onClick(view)}"
+			android:text="sample"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+		<Button
+			android:onClick="@{view -> dialogClick.onClick(view)}"
+			android:text="dialog"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+		<Button
+			android:onClick="@{view -> fragmentClick.onClick(view)}"
+			android:text="fragment"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+	</LinearLayout>
+</layout>

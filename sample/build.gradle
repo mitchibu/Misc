@@ -1,0 +1,95 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+
+    dataBinding {
+        enabled = true
+    }
+
+    defaultConfig {
+        applicationId "jp.co.apcom.sample"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "default", "usage"
+    productFlavors {
+        product {
+            dimension "default"
+            buildConfigField "String", "BASE_URL", "\"https://www.yahoo.co.jp\""
+        }
+        staging {
+            dimension "default"
+            buildConfigField "String", "BASE_URL", "\"https://www.google.co.jp\""
+        }
+        normal {
+            dimension "usage"
+            buildConfigField "boolean", "MOCK", "false"
+        }
+        mock {
+            dimension "usage"
+            buildConfigField "boolean", "MOCK", "true"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+// https://gist.github.com/tianzhijiexian/2853c097762a203cd1d024c1f846dcc3
+/*configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == "com.android.support") {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion "26.+"
+            }
+        }
+    }
+}*/
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation deps.support.appcompat
+    implementation deps.support.constraintlayout
+    implementation 'com.android.support:support-v4:28.0.0'
+    testImplementation deps.test.junit
+    androidTestImplementation deps.test.support.runner
+    androidTestImplementation deps.test.support.espresso_core
+    implementation deps.dagger
+    annotationProcessor deps.dagger_compiler
+    implementation deps.dagger_android
+    implementation deps.dagger_android_support
+    annotationProcessor deps.dagger_android_processor
+    implementation deps.rxjava
+    implementation deps.rxandroid
+    implementation deps.retrofit
+    implementation deps.retrofit_adapter_rxjava2
+    implementation deps.retrofit_converter_moshi
+    implementation deps.okhttp
+    implementation deps.okhttp_logging_interceptor
+    implementation deps.room_runtime
+    implementation deps.room_rxjava
+    annotationProcessor deps.room_compiler
+    implementation deps.support.recyclerview
+    implementation deps.lifecycle_extensions
+    implementation deps.play_services.location
+
+    compileOnly project(':Processor')
+    annotationProcessor project(':Processor')
+}
