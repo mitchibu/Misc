@@ -21,6 +21,9 @@ public interface EntityA_DAO {
 	@Query("select * from entityA")
 	DataSource.Factory<Integer, EntityA> get3();
 
+	@Query("select * from entityA where id = :id limit 1")
+	EntityA findById(long id);
+
 	@Insert
 	void insert(EntityA... entities);
 

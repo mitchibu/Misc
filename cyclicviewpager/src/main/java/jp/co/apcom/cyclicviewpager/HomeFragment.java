@@ -1,5 +1,6 @@
 package jp.co.apcom.cyclicviewpager;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
@@ -12,8 +13,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import dagger.android.support.DaggerFragment;
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableOnSubscribe;
+import io.reactivex.CompletableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import jp.co.apcom.cyclicviewpager.databinding.FragmentHomeBinding;
+import jp.co.apcom.cyclicviewpager.fragment.PageInHomeFragment;
+import jp.co.apcom.cyclicviewpager.retrofit.ApiInterface;
+import jp.co.apcom.cyclicviewpager.room.EntityA;
+import jp.co.apcom.cyclicviewpager.room.MyDatabase;
+import jp.co.apcom.cyclicviewpager.rx.RxLifecycle;
 import jp.co.apcom.cyclicviewpager.viewmodel.HomeFragmentViewModel;
 import jp.co.apcom.cyclicviewpager.viewmodel.SavableInstanceStateViewModelFactory;
 import jp.co.apcom.cyclicviewpager.viewpager.CyclicPagerAdapter;
@@ -26,6 +45,12 @@ public class HomeFragment extends DaggerFragment {
 			"Lady's",
 			"Kid's"
 	};
+
+	@Inject
+	MyDatabase db;
+	@Inject
+	ApiInterface api;
+
 	private HomeFragmentViewModel model;
 	private FragmentHomeBinding binding;
 
@@ -53,10 +78,58 @@ public class HomeFragment extends DaggerFragment {
 	}
 
 	@Override
+	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		if(savedInstanceState != null) return;
+		loadData(null, null);
+	}
+
+	@Override
 	public void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
 		model.page.setValue(binding.pager.getCurrentItem());
 		model.writeTo(outState);
+	}
+
+	@SuppressWarnings("ResultOfMethodCallIgnored")
+	@SuppressLint("CheckResult")
+	public void loadData(Runnable doStart, final Runnable doFinally) {
+		if(doStart != null) doStart.run();
+		api.test()
+				.flatMapCompletable(new Function<List<EntityA>, CompletableSource>() {
+					@Override
+					public CompletableSource apply(final List<EntityA> entityAS) throws Exception {
+						return Completable.create(new CompletableOnSubscribe() {
+							@Override
+							public void subscribe(CompletableEmitter emitter) throws Exception {
+								db.entityADao().deleteAll();
+								if(!entityAS.isEmpty()) {
+									db.entityADao().insert(entityAS.toArray(new EntityA[0]));
+								}
+								emitter.onComplete();
+							}
+						});
+					}
+				})
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.takeUntil(RxLifecycle.OnStopAsObservable(getLifecycle()).ignoreElements())
+				.doFinally(new Action() {
+					@Override
+					public void run() throws Exception {
+						if(doFinally != null) doFinally.run();
+					}
+				})
+				.subscribe(new Action() {
+					@Override
+					public void run() throws Exception {
+					}
+				}, new Consumer<Throwable>() {
+					@Override
+					public void accept(Throwable throwable) throws Exception {
+						throwable.printStackTrace();
+					}
+				});
 	}
 
 	class MyPagerAdapter extends CyclicPagerAdapter {
@@ -73,7 +146,8 @@ public class HomeFragment extends DaggerFragment {
 			args.putString("test", "" + page);
 			Fragment f = m.get(page);
 			if(f == null) {
-				f = page == 0 ? new RecyclerViewFragment() : new TestFragment();
+//				f = page == 0 ? new PageInHomeFragment() : new TestFragment();
+				f = new PageInHomeFragment();
 				m.put(page, f);
 				f.setArguments(args);
 			}
