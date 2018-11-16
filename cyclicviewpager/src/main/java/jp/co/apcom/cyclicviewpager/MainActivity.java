@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatDelegate;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.Menu;
@@ -24,7 +23,7 @@ import java.util.Objects;
 import dagger.android.support.DaggerAppCompatActivity;
 import jp.co.apcom.cyclicviewpager.databinding.ActivityMainBinding;
 import jp.co.apcom.cyclicviewpager.viewmodel.MainActivityViewModel;
-import jp.co.apcom.cyclicviewpager.viewmodel.ParcelableViewModelFactory;
+import jp.co.apcom.cyclicviewpager.viewmodel.SavableInstanceStateViewModelFactory;
 
 public class MainActivity extends DaggerAppCompatActivity {
 	private static final String TAG_HOME = "home";
@@ -43,6 +42,7 @@ public class MainActivity extends DaggerAppCompatActivity {
 		super.onCreate(savedInstanceState);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+		binding.setLifecycleOwner(this);
 		setSupportActionBar(binding.toolBar);
 		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawer, binding.toolBar, 0, 0);
 		binding.drawer.addDrawerListener(toggle);
@@ -63,7 +63,7 @@ public class MainActivity extends DaggerAppCompatActivity {
 			}
 		});
 
-		model = ViewModelProviders.of(this, new ParcelableViewModelFactory(getApplication(), savedInstanceState)).get(MainActivityViewModel.class);
+		model = ViewModelProviders.of(this, new SavableInstanceStateViewModelFactory(this, savedInstanceState)).get(MainActivityViewModel.class);
 		model.tab.observe(this, new Observer<Integer>() {
 			@Override
 			public void onChanged(@Nullable Integer tab) {
@@ -79,7 +79,7 @@ public class MainActivity extends DaggerAppCompatActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		model.writeTo(outState);
+		//model.writeTo(outState);
 	}
 
 	@Override

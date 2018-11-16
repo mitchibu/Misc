@@ -12,12 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.Objects;
-
 import dagger.android.support.DaggerFragment;
 import jp.co.apcom.cyclicviewpager.databinding.FragmentHomeBinding;
 import jp.co.apcom.cyclicviewpager.viewmodel.HomeFragmentViewModel;
-import jp.co.apcom.cyclicviewpager.viewmodel.ParcelableViewModelFactory;
+import jp.co.apcom.cyclicviewpager.viewmodel.SavableInstanceStateViewModelFactory;
 import jp.co.apcom.cyclicviewpager.viewpager.CyclicPagerAdapter;
 import jp.co.apcom.cyclicviewpager.viewpager.PageTransformer;
 
@@ -34,7 +32,7 @@ public class HomeFragment extends DaggerFragment {
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		model = ViewModelProviders.of(this, new ParcelableViewModelFactory(Objects.requireNonNull(getActivity()).getApplication(), savedInstanceState)).get(HomeFragmentViewModel.class);
+		model = ViewModelProviders.of(this, new SavableInstanceStateViewModelFactory(this, savedInstanceState)).get(HomeFragmentViewModel.class);
 		model.page.observe(this, new Observer<Integer>() {
 			@Override
 			public void onChanged(@Nullable Integer page) {

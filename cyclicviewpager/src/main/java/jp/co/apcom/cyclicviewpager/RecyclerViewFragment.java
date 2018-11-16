@@ -1,6 +1,5 @@
 package jp.co.apcom.cyclicviewpager;
 
-import android.app.ActivityOptions;
 import android.arch.lifecycle.ViewModelProviders;
 import android.arch.paging.PagedList;
 import android.content.Intent;
@@ -8,6 +7,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -35,7 +35,7 @@ import jp.co.apcom.cyclicviewpager.retrofit.ApiInterface;
 import jp.co.apcom.cyclicviewpager.room.EntityA;
 import jp.co.apcom.cyclicviewpager.room.MyDatabase;
 import jp.co.apcom.cyclicviewpager.view.OnItemClickListener;
-import jp.co.apcom.cyclicviewpager.viewmodel.ParcelableViewModelFactory;
+import jp.co.apcom.cyclicviewpager.viewmodel.SavableInstanceStateViewModelFactory;
 import jp.co.apcom.cyclicviewpager.viewmodel.RecyclerViewFragmentViewModel;
 
 public class RecyclerViewFragment extends DaggerFragment {
@@ -54,7 +54,7 @@ public class RecyclerViewFragment extends DaggerFragment {
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		model = ViewModelProviders.of(this, new ParcelableViewModelFactory(Objects.requireNonNull(getActivity()).getApplication(), savedInstanceState)).get(RecyclerViewFragmentViewModel.class);
+		model = ViewModelProviders.of(this, new SavableInstanceStateViewModelFactory(this, savedInstanceState)).get(RecyclerViewFragmentViewModel.class);
 	}
 
 	@Override
@@ -64,11 +64,7 @@ public class RecyclerViewFragment extends DaggerFragment {
 		binding.list.setAdapter(adapter.setOnItemClickListener(new OnItemClickListener<EntityA>() {
 			@Override
 			public void onItemClick(View view, int position, EntityA data) {
-				android.util.Log.v("test", "onItemClick: " + position);
-				Intent intent = new Intent(getContext(), DetailActivity.class);
-				intent.putExtra(DetailActivity.EXTRA_ITEM, data);
-				ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(Objects.requireNonNull(getActivity()), view.findViewById(R.id.image), "share");
-				startActivity(intent, options.toBundle());
+				showDetail(data);
 			}
 		}));
 		binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -83,7 +79,7 @@ public class RecyclerViewFragment extends DaggerFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		disposables.add(model.modelList
+		disposables.add(model.get(db.entityADao())
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(new Consumer<PagedList<EntityA>>() {
@@ -110,6 +106,12 @@ public class RecyclerViewFragment extends DaggerFragment {
 	public void onResume() {
 		super.onResume();
 		if(!isLoaded()) loadData();
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		model.writeTo(outState);
 	}
 
 	private boolean isLoaded() {
@@ -153,5 +155,12 @@ public class RecyclerViewFragment extends DaggerFragment {
 						throwable.printStackTrace();
 					}
 				}));
+	}
+
+	private void showDetail(EntityA data) {
+		Intent intent = new Intent(getContext(), DetailActivity.class);
+		intent.putExtra(DetailActivity.EXTRA_ITEM, data);
+		ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(Objects.requireNonNull(getActivity()), view.findViewById(R.id.image), "share");
+		ActivityCompat.startActivity(Objects.requireNonNull(getContext()), intent, options.toBundle());
 	}
 }

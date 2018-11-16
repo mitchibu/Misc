@@ -1,11 +1,12 @@
 package jp.co.apcom.cyclicviewpager.viewmodel;
 
 import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-public class HomeFragmentViewModel extends ParcelableViewModel {
+public class HomeFragmentViewModel extends AndroidViewModel implements SavableInstanceState {
 	public final MutableLiveData<Integer> page = new MutableLiveData<>();
 
 	public HomeFragmentViewModel(@NonNull Application application) {
