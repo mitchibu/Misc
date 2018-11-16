@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<group android:id="@+id/main" android:checkableBehavior="single">
+		<item android:id="@+id/home" android:title="Home" android:icon="@drawable/ic_home_24dp"/>
+		<item android:id="@+id/search" android:title="Search" android:icon="@drawable/ic_search_24dp"/>
+		<item android:id="@+id/bookmark" android:title="Bookmark" android:icon="@drawable/ic_bookmark_24dp"/>
+		<item android:id="@+id/cart" android:title="Cart" android:icon="@drawable/ic_shopping_cart_24dp"/>
+	</group>
+	<group android:id="@+id/other" android:checkableBehavior="single">
+		<item android:id="@+id/home2" android:title="Home" android:icon="@drawable/ic_home_24dp"/>
+		<item android:id="@+id/search2" android:title="Search" android:icon="@drawable/ic_search_24dp"/>
+		<item android:id="@+id/bookmark2" android:title="Bookmark" android:icon="@drawable/ic_bookmark_24dp"/>
+		<item android:id="@+id/cart2" android:title="Cart" android:icon="@drawable/ic_shopping_cart_24dp"/>
+	</group>
+</menu>

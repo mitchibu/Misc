@@ -22,7 +22,7 @@ android {
 
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments += ["room.schemaLocation":"$projectDir/schemas".toString()]
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
     }
@@ -50,6 +50,7 @@ dependencies {
     implementation deps.lifecycle_extensions
 
     implementation deps.dagger
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     annotationProcessor deps.dagger_compiler
     implementation deps.dagger_android
     implementation deps.dagger_android_support
@@ -80,6 +81,8 @@ dependencies {
     implementation "android.arch.paging:rxjava2:$paging_version"
 
     implementation 'net.yanzm:loopviewpager:25.0.1'
+
+    implementation deps.picasso
 
     testImplementation deps.test.junit
     androidTestImplementation deps.test.support.runner

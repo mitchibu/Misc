@@ -5,16 +5,52 @@
 		<variable
 			name="item"
 			type="jp.co.apcom.cyclicviewpager.room.EntityA"/>
+		<variable
+			name="position"
+			type="int"/>
+		<variable
+			name="onItemClickListrener"
+			type="jp.co.apcom.cyclicviewpager.view.OnItemClickListener"/>
 	</data>
+	<android.support.constraint.ConstraintLayout
+		android:background="@android:drawable/list_selector_background"
+		android:onClick="@{v->onItemClickListrener.onItemClick(v, position, item)}"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<ImageView
+			app:layout_constraintLeft_toLeftOf="parent"
+			app:layout_constraintTop_toTopOf="parent"
+			app:layout_constraintRight_toRightOf="parent"
+			app:layout_constraintDimensionRatio="H,16:9"
+			android:id="@+id/image"
+			android:contentDescription="@null"
+			android:src="@{item}"
+			android:layout_width="0dp"
+			android:layout_height="0dp" />
+		<TextView
+			app:layout_constraintLeft_toLeftOf="parent"
+			app:layout_constraintTop_toBottomOf="@id/image"
+			app:layout_constraintRight_toRightOf="parent"
+			android:text="@{item.name}"
+			android:layout_gravity="center_vertical"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"/>
+	</android.support.constraint.ConstraintLayout>
+	<!--
 	<LinearLayout
 		android:orientation="vertical"
 		android:minHeight="64dp"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content">
+		<ImageView
+			android:contentDescription="@null"
+			android:src="@{item}"
+			android:layout_width="match_parent"
+			android:layout_height="100dp" />
 		<TextView
 			android:text="@{item.name}"
 			android:layout_gravity="center_vertical"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"/>
-	</LinearLayout>
+	</LinearLayout>-->
 </layout>

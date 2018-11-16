@@ -8,18 +8,15 @@ import android.support.annotation.NonNull;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import jp.co.apcom.cyclicviewpager.MyApplication;
 import jp.co.apcom.cyclicviewpager.room.EntityA;
-import jp.co.apcom.cyclicviewpager.room.MyDatabase;
 
 public class RecyclerViewFragmentViewModel extends ParcelableViewModel {
-	public Flowable<PagedList<EntityA>> modelList;
+	public final Flowable<PagedList<EntityA>> modelList;
 
 	public RecyclerViewFragmentViewModel(@NonNull Application application) {
 		super(application);
-	}
-
-	public void init(MyDatabase db) {
-		modelList = new RxPagedListBuilder<>(db.entityADao().get3(),/* page size */ 20).buildFlowable(BackpressureStrategy.LATEST);
+		modelList = new RxPagedListBuilder<>(((MyApplication)application).db.entityADao().get3(),/* page size */ 20).buildFlowable(BackpressureStrategy.LATEST);
 	}
 
 	@Override

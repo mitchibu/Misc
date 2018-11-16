@@ -62,7 +62,7 @@
 		</android.support.constraint.ConstraintLayout>
 		<android.support.design.widget.NavigationView
 			app:headerLayout="@layout/drawer_header"
-			app:menu="@menu/bottom_navigation"
+			app:menu="@menu/drawer"
 			android:id="@+id/navigation"
 			android:layout_gravity="start"
 			android:layout_width="wrap_content"
