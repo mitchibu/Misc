@@ -3,7 +3,13 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
 
+    dataBinding {
+        enabled = true
+    }
 
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
 
     defaultConfig {
         applicationId "jp.co.apcom.cyclicviewpager"
@@ -14,6 +20,11 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation":"$projectDir/schemas".toString()]
+            }
+        }
     }
 
     buildTypes {
@@ -25,13 +36,52 @@ android {
 
 }
 
+repositories {
+    maven {
+        url 'https://github.com/yanzm/LoopViewPager/raw/master/maven-repo'
+    }
+}
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation deps.support.appcompat
+    implementation deps.support.constraintlayout
+    implementation deps.support.design
+    implementation deps.support.recyclerview
+    implementation deps.lifecycle_extensions
 
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'com.android.support:support-v4:28.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation deps.dagger
+    annotationProcessor deps.dagger_compiler
+    implementation deps.dagger_android
+    implementation deps.dagger_android_support
+    annotationProcessor deps.dagger_android_processor
+
+    implementation deps.rxjava
+    implementation deps.rxandroid
+
+    implementation deps.retrofit
+    implementation deps.retrofit_adapter_rxjava2
+    implementation deps.retrofit_converter_moshi
+
+    implementation deps.okhttp
+    implementation deps.okhttp_logging_interceptor
+
+    implementation deps.room_runtime
+    implementation deps.room_rxjava
+    annotationProcessor deps.room_compiler
+    androidTestImplementation deps.room_testing
+
+    def paging_version = "1.0.1"
+    implementation "android.arch.paging:runtime:$paging_version"
+
+    // alternatively - without Android dependencies for testing
+    testImplementation "android.arch.paging:common:$paging_version"
+
+    // optional - RxJava support
+    implementation "android.arch.paging:rxjava2:$paging_version"
+
+    implementation 'net.yanzm:loopviewpager:25.0.1'
+
+    testImplementation deps.test.junit
+    androidTestImplementation deps.test.support.runner
+    androidTestImplementation deps.test.support.espresso_core
 }

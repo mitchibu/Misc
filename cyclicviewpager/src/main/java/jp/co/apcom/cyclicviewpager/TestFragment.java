@@ -1,36 +1,23 @@
 package jp.co.apcom.cyclicviewpager;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.Objects;
 
-public class TestFragment extends Fragment {
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//		android.util.Log.v("test", "onCreateView");
-		View v = inflater.inflate(R.layout.fragment_test, container, false);
-//		TextView t = v.findViewById(R.id.test);
-//		t.setText(Objects.requireNonNull(getArguments()).getString("test"));
-		return v;
-	}
+import dagger.android.support.DaggerFragment;
+import jp.co.apcom.cyclicviewpager.databinding.FragmentTestBinding;
 
+public class TestFragment extends DaggerFragment {
 	@Override
-	public void onCreate(@Nullable Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-//		android.util.Log.v("test", "onCreate");
-	}
-
-	@Override
-	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//		android.util.Log.v("test", "onActivityCreated");
-		super.onActivityCreated(savedInstanceState);
-		TextView t = getView().findViewById(R.id.test);
-		t.setText(Objects.requireNonNull(getArguments()).getString("test"));
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		FragmentTestBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_test, container, false);
+		binding.setLifecycleOwner(this);
+		binding.test.setText(Objects.requireNonNull(getArguments()).getString("test"));
+		return binding.getRoot();
 	}
 }
