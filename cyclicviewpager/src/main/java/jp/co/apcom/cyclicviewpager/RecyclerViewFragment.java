@@ -64,7 +64,7 @@ public class RecyclerViewFragment extends DaggerFragment {
 		binding.list.setAdapter(adapter.setOnItemClickListener(new OnItemClickListener<EntityA>() {
 			@Override
 			public void onItemClick(View view, int position, EntityA data) {
-				showDetail(data);
+				showDetail(data, view.findViewById(R.id.image));
 			}
 		}));
 		binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -157,10 +157,10 @@ public class RecyclerViewFragment extends DaggerFragment {
 				}));
 	}
 
-	private void showDetail(EntityA data) {
+	private void showDetail(EntityA data, View share) {
 		Intent intent = new Intent(getContext(), DetailActivity.class);
 		intent.putExtra(DetailActivity.EXTRA_ITEM, data);
-		ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(Objects.requireNonNull(getActivity()), view.findViewById(R.id.image), "share");
+		ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(Objects.requireNonNull(getActivity()), share, "share");
 		ActivityCompat.startActivity(Objects.requireNonNull(getContext()), intent, options.toBundle());
 	}
 }
