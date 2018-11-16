@@ -25,7 +25,7 @@ public class MyApplication extends DaggerApplication {
 		super.onCreate();
 		Picasso picasso = new Picasso.Builder(this).build();
 		picasso.setIndicatorsEnabled(true);
-		picasso.setLoggingEnabled(true);
+//		picasso.setLoggingEnabled(true);
 		Picasso.setSingletonInstance(picasso);
 	}
 

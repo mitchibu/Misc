@@ -36,33 +36,23 @@ public class PageInHomeFragment extends PagedListFragment<EntityA> {
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setListAdapter(new ItemListAdapter());
+		setListAdapter(new ItemListAdapter().setOnItemClickListener(new OnItemClickListener<EntityA>() {
+			@Override
+			public void onItemClick(View view, int position, EntityA data) {
+				showDetail(data, view.findViewById(R.id.image));
+			}
+		}));
 	}
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = DataBindingUtil.inflate(inflater, R.layout.fragment_recycler_view, container, false);
 		binding.setLifecycleOwner(this);
-		binding.list.setAdapter(((ItemListAdapter)getListAdapter()).setOnItemClickListener(new OnItemClickListener<EntityA>() {
-			@Override
-			public void onItemClick(View view, int position, EntityA data) {
-				showDetail(data, view.findViewById(R.id.image));
-			}
-		}));
+		binding.list.setAdapter(getListAdapter());
 		binding.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
-				((HomeFragment)Objects.requireNonNull(getParentFragment())).loadData(new Runnable() {
-					@Override
-					public void run() {
-						binding.swipe.setRefreshing(true);
-					}
-				}, new Runnable() {
-					@Override
-					public void run() {
-						binding.swipe.setRefreshing(false);
-					}
-				});
+				((HomeFragment)Objects.requireNonNull(getParentFragment())).refresh(binding.swipe);
 			}
 		});
 		return binding.getRoot();
@@ -75,12 +65,12 @@ public class PageInHomeFragment extends PagedListFragment<EntityA> {
 	}
 
 	@Override
-	protected void onQuery(PagedList<EntityA> list) throws Exception {
+	protected void onQuery(PagedList<EntityA> list) {
 		binding.setIsEmpty(list.isEmpty());
 	}
 
 	@Override
-	protected void onQueryError(Throwable e) throws Exception {
+	protected void onQueryError(Throwable e) {
 		e.printStackTrace();
 	}
 

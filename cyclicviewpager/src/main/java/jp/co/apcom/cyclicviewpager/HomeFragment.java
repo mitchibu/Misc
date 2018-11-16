@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,6 +90,20 @@ public class HomeFragment extends DaggerFragment {
 		super.onSaveInstanceState(outState);
 		model.page.setValue(binding.pager.getCurrentItem());
 		model.writeTo(outState);
+	}
+
+	public void refresh(final SwipeRefreshLayout swipe) {
+		loadData(new Runnable() {
+			@Override
+			public void run() {
+				swipe.setRefreshing(true);
+			}
+		}, new Runnable() {
+			@Override
+			public void run() {
+				swipe.setRefreshing(false);
+			}
+		});
 	}
 
 	@SuppressWarnings("ResultOfMethodCallIgnored")
