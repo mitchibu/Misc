@@ -2,6 +2,8 @@ package jp.co.apcom.cyclicviewpager;
 
 import android.support.v7.app.AppCompatDelegate;
 
+import com.squareup.picasso.Picasso;
+
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;
@@ -17,6 +19,15 @@ public class MyApplication extends DaggerApplication {
 
 	@Inject
 	public MyDatabase db;
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		Picasso picasso = new Picasso.Builder(this).build();
+		picasso.setIndicatorsEnabled(true);
+		picasso.setLoggingEnabled(true);
+		Picasso.setSingletonInstance(picasso);
+	}
 
 	@Override
 	protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
