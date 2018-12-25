@@ -1,1 +1,1 @@
-include ':app', ':room', ':rx', ':lifecycle', ':databindingrecyclerview', ':retrofit2', ':validator', ':splash', ':dagger2', ':sampleandroidx', ':sample', ':Processor', ':paging', ':test', ':cyclicviewpager', ':coordinatorlayout', ':camera2'
+include ':app', ':room', ':rx', ':lifecycle', ':databindingrecyclerview', ':retrofit2', ':validator', ':splash', ':dagger2', ':sampleandroidx', ':sample', ':Processor', ':paging', ':test', ':cyclicviewpager', ':coordinatorlayout', ':camera2', ':permission', ':ble'
