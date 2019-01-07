@@ -11,9 +11,7 @@ import android.content.Context;
 
 import java.lang.reflect.Method;
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,65 +25,37 @@ public class GattServer {
 
 		@Override
 		public void onCharacteristicReadRequest(BluetoothDevice device, int requestId, int offset, BluetoothGattCharacteristic characteristic) {
-			int status = BluetoothGatt.GATT_FAILURE;
-			byte[] value = null;
-			GattMap m = map.get(characteristic.getService().getUuid().toString());
-			if(m != null) {
-				Method method = m.map.get(characteristic.getUuid().toString());
-				if(method != null) {
-					try {
-						Class<?>[] types = method.getParameterTypes();
-						List<Object> params = new ArrayList<>();
-						for(Class<?> type : types) {
-							if(type.isAssignableFrom(BluetoothDevice.class)) params.add(device);
-							else if(type.isAssignableFrom(int.class)) params.add(requestId);
-							else if(type.isAssignableFrom(int.class)) params.add(offset);
-							else if(type.isAssignableFrom(BluetoothGattCharacteristic.class))
-								params.add(characteristic);
-						}
-						GattResult result = (GattResult)method.invoke(m.service, params.toArray(new Object[0]));
-						value = result.value;
-						status = result.status;
-					} catch(Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			server.sendResponse(device, requestId, status, offset, value);
+			GattParams params = new GattParams(device, requestId, offset, characteristic);
+			GattResult result = invoke(params);
+			server.sendResponse(device, requestId, result == null ? BluetoothGatt.GATT_FAILURE : result.status, offset, result == null ? null : result.value);
 		}
 
 		@Override
 		public void onCharacteristicWriteRequest(BluetoothDevice device, int requestId, BluetoothGattCharacteristic characteristic, boolean preparedWrite, boolean responseNeeded, int offset, byte[] value) {
-			int status = BluetoothGatt.GATT_FAILURE;
-			GattMap m = map.get(characteristic.getService().getUuid().toString());
-			if(m != null) {
-				Method method = m.map.get(characteristic.getUuid().toString());
-				if(method != null) {
-					try {
-						Class<?>[] types = method.getParameterTypes();
-						List<Object> params = new ArrayList<>();
-						for(Class<?> type : types) {
-							if(type.isAssignableFrom(BluetoothDevice.class)) params.add(device);
-							else if(type.isAssignableFrom(int.class)) params.add(requestId);
-							else if(type.isAssignableFrom(BluetoothGattCharacteristic.class)) params.add(characteristic);
-							else if(type.isAssignableFrom(boolean.class)) params.add(preparedWrite);
-							else if(type.isAssignableFrom(boolean.class)) params.add(responseNeeded);
-							else if(type.isAssignableFrom(int.class)) params.add(offset);
-							else if(type.isAssignableFrom(byte[].class)) params.add(value);
-						}
-						GattResult result = (GattResult)method.invoke(m.service, params.toArray(new Object[0]));
-						status = result.status;
-					} catch(Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
+			GattParams params = new GattParams(device, requestId, characteristic, preparedWrite, responseNeeded, offset, value);
+			GattResult result = invoke(params);
 			if(responseNeeded) {
-				server.sendResponse(device, requestId, status, offset, null);
+				server.sendResponse(device, requestId, result == null ? BluetoothGatt.GATT_FAILURE : result.status, offset, null);
 			}
 		}
+
+		private GattResult invoke(GattParams params) {
+			MethodMap m = services.get(params.characteristic.getService().getUuid().toString());
+			if(m == null) return null;
+
+			Method method = m.get(params.characteristic.getUuid().toString());
+			if(method == null) return null;
+
+			try {
+				return (GattResult)method.invoke(m.observer, params);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
 	};
-	private final Map<String, GattMap> map = new HashMap<>();
+
+	private final Map<String, MethodMap> services = new HashMap<>();
 	private final BluetoothGattServer server;
 	private final StateObserver stateObserver;
 
@@ -99,8 +69,8 @@ public class GattServer {
 		server.close();
 	}
 
-	public void addService(Object impl) {
-		Class<?> clazz = impl.getClass();
+	public void addService(GattObserver observer) {
+		Class<?> clazz = observer.getClass();
 		GattService gattService = clazz.getAnnotation(GattService.class);
 		if(gattService == null) throw new InvalidParameterException();
 
@@ -109,10 +79,10 @@ public class GattServer {
 				UUID.fromString(serviceUuid),
 				gattService.type());
 
-		GattMap gattMap = new GattMap(impl);
+		MethodMap methodMap = new MethodMap(observer);
 		Method[] methods = clazz.getMethods();
 		for(Method method : methods) {
-			if(method.getReturnType().isAssignableFrom(GattResult.class)) {
+			if(isValidMethod(method)) {
 				GattCharacteristic gattCharacteristic = method.getAnnotation(GattCharacteristic.class);
 				if(gattCharacteristic != null) {
 					String characteristicUuid = gattCharacteristic.uuid();
@@ -121,50 +91,33 @@ public class GattServer {
 							gattCharacteristic.properties(),
 							gattCharacteristic.permissions());
 					service.addCharacteristic(characteristic);
-					gattMap.map.put(characteristicUuid, method);
+					methodMap.put(characteristicUuid, method);
 				}
 			}
 		}
-		if(!gattMap.map.isEmpty()) map.put(serviceUuid, gattMap);
-		if(!map.isEmpty()) server.addService(service);
+		if(!methodMap.isEmpty()) services.put(serviceUuid, methodMap);
+		if(!services.isEmpty()) server.addService(service);
+	}
+
+	private boolean isValidMethod(Method method) {
+		if(!method.getReturnType().isAssignableFrom(GattResult.class)) return false;
+
+		Class<?>[] types = method.getParameterTypes();
+		for(Class<?> type : types) {
+			if(!type.isAssignableFrom(GattParams.class)) return false;
+		}
+		return true;
 	}
 
 	public interface StateObserver {
 		void onStateChange(BluetoothDevice device, int status, int newState);
 	}
 
-	public static class GattResult {
-		public static GattResult success() {
-			return success(null);
-		}
+	private static class MethodMap extends HashMap<String, Method> {
+		final GattObserver observer;
 
-		public static GattResult success(byte[] value) {
-			return new GattResult(BluetoothGatt.GATT_SUCCESS, value);
-		}
-
-		public static GattResult failure() {
-			return new GattResult(BluetoothGatt.GATT_FAILURE);
-		}
-
-		private final int status;
-		private final byte[] value;
-
-		public GattResult(int status) {
-			this(status, null);
-		}
-
-		public GattResult(int status, byte[] value) {
-			this.status = status;
-			this.value = value;
-		}
-	}
-
-	private static class GattMap {
-		final Object service;
-		final Map<String, Method> map = new HashMap<>();
-
-		GattMap(Object service) {
-			this.service = service;
+		MethodMap(GattObserver observer) {
+			this.observer = observer;
 		}
 	}
 }

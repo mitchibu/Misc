@@ -8,6 +8,9 @@ import android.os.Bundle;
 import java.util.UUID;
 
 import jp.gr.java_conf.mitchibu.ble.ble.GattCharacteristic;
+import jp.gr.java_conf.mitchibu.ble.ble.GattObserver;
+import jp.gr.java_conf.mitchibu.ble.ble.GattParams;
+import jp.gr.java_conf.mitchibu.ble.ble.GattResult;
 import jp.gr.java_conf.mitchibu.ble.ble.GattServer;
 import jp.gr.java_conf.mitchibu.ble.ble.GattService;
 import jp.gr.java_conf.mitchibu.ble.ble.Peripheral;
@@ -84,21 +87,21 @@ public class MainActivity extends AppCompatActivity {
 	}*/
 
 	@GattService(uuid = UUID_SERVICE)
-	static class GattServiceImpl {
+	static class GattServiceImpl implements GattObserver {
 		@GattCharacteristic(
 				uuid = UUID_CHARACTERISTIC_READ,
 				properties = BluetoothGattCharacteristic.PROPERTY_READ,
 				permissions = BluetoothGattCharacteristic.PERMISSION_READ)
-		public GattServer.GattResult readTest(int requestId, int offset, BluetoothGattCharacteristic characteristic) {
-			return GattServer.GattResult.success();
+		public GattResult readTest(GattParams params) {
+			return GattResult.success();
 		}
 
 		@GattCharacteristic(
 				uuid = UUID_CHARACTERISTIC_WRITE,
 				properties = BluetoothGattCharacteristic.PROPERTY_WRITE,
 				permissions = BluetoothGattCharacteristic.PERMISSION_WRITE)
-		public GattServer.GattResult writeTest(int requestId, int offset, BluetoothGattCharacteristic characteristic, byte[] value) {
-			return GattServer.GattResult.success();
+		public GattResult writeTest(GattParams params) {
+			return GattResult.success();
 		}
 	}
 }
