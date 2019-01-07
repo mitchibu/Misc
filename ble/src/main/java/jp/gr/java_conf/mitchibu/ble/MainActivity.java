@@ -7,12 +7,12 @@ import android.os.Bundle;
 
 import java.util.UUID;
 
-import jp.gr.java_conf.mitchibu.ble.ble.GattCharacteristic;
+import jp.gr.java_conf.mitchibu.ble.ble.annotation.GattCharacteristic;
 import jp.gr.java_conf.mitchibu.ble.ble.GattObserver;
 import jp.gr.java_conf.mitchibu.ble.ble.GattParams;
 import jp.gr.java_conf.mitchibu.ble.ble.GattResult;
 import jp.gr.java_conf.mitchibu.ble.ble.GattServer;
-import jp.gr.java_conf.mitchibu.ble.ble.GattService;
+import jp.gr.java_conf.mitchibu.ble.ble.annotation.GattService;
 import jp.gr.java_conf.mitchibu.ble.ble.Peripheral;
 
 public class MainActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package jp.gr.java_conf.mitchibu.ble.ble;
+package jp.gr.java_conf.mitchibu.ble.ble.annotation;
 
 import android.bluetooth.BluetoothGattService;
 

@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import jp.gr.java_conf.mitchibu.ble.ble.annotation.GattCharacteristic;
+import jp.gr.java_conf.mitchibu.ble.ble.annotation.GattService;
+
 public class GattServer {
 	private final BluetoothGattServerCallback callback = new BluetoothGattServerCallback() {
 		@Override
